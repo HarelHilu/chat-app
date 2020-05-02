@@ -13,7 +13,6 @@ const Chat = ({location}) => {
     const [messages, setMessages] = useState([]);
     const ENDPOINT = 'localhost:5000';
 
-    // I want this pieace of code to run only when server endpoint or the url is changed for not calling the server each time chat is rendered
     useEffect(()=>{
         const {name, room} = querystring.parse(location.search);
 
@@ -28,7 +27,7 @@ const Chat = ({location}) => {
             socket.emit('disconnect');
             socket.off();
         }
-    }, [ENDPOINT, location.search]);
+    }, location.search);
 
     useEffect(()=> {
         socket.on('message', (message) => {
@@ -38,7 +37,7 @@ const Chat = ({location}) => {
     }, [messages]);
     
     const sendMessage = (event) => {
-        event.preventDefault();
+        //event.preventDefault();
         socket.emit('sendMessage', message, () => setMessage(''));
     }
 

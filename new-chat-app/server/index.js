@@ -1,24 +1,17 @@
 const express = require('express');
 const socketio = require('socket.io');
-const https = require('https');
 const cors = require('cors');
 const axios = require('axios');
-var bodyParser = require('body-parser')
-
+const http = require('http');
+const https = require('https');
 const PORT = process.env.PORT || 5000;
 const fs = require('fs');
 const router = require('./router');
-
 const app = express();
-//const server = http.createServer(app);
-const server = 
-https.createServer({
-    key: fs.readFileSync('./key.pem'),
-    cert: fs.readFileSync('./cert.pem'),
-    passphrase: '123abc'
-}, app)
-const io = socketio(server);
-//const https = require('https')
+const server = http.createServer(app);
+
+var io = socketio(server);
+var bodyParser = require('body-parser')
 
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: true}));
@@ -26,8 +19,9 @@ app.use( express.json() );
 app.use(bodyParser.json())
 
   app.post( '/', ( req, res ) => {
-      console.log( 'received webhook: ' + JSON.stringify(req.body));
-      res.sendStatus( 200 );
+    io.in('wix').emit('message', { user: 'Budhha the Admin', text: 'message was sent in wix-chat. Go and check it out'});
+    //io.broadcast.to("wix").emit('message', { user: 'Budhha the Admin', text: 'message was sent in wix-chat. Go and check it out'});
+    res.sendStatus( 200 );
 } ); 
 
 app.get('/auth', ( req, res ) => {
@@ -48,7 +42,7 @@ app.get('/auth', ( req, res ) => {
       }
     }
     
-    //process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+    process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
     
     const httpsreq = https.request(options, res => {
     res.on('data', d => {
@@ -62,14 +56,11 @@ app.get('/auth', ( req, res ) => {
     httpsreq.write(data);
     httpsreq.end();
     res.sendStatus( 200 );
-
 } ); 
-
-
-
 
 io.on('connection', (socket) => {
     const users = [];
+    
     const removeUser = (id) => {
         const inde = users.findIndex((user) => user.id === id);
     
@@ -79,9 +70,6 @@ io.on('connection', (socket) => {
     }
     const getUser = (id) => {
         return users.find((user) => user.id === id);
-    }
-    const usersInRoom = (room) => {
-        users.filter((user) => user.room === room);
     }
 
     socket.on('join', ({name, room}) => {
@@ -97,17 +85,11 @@ io.on('connection', (socket) => {
 
     socket.on('sendMessage', (message, callback) => {
             const user = getUser(socket.id);
-            console.log(user);
             io.to(user.room).emit('message', {user: user.name, text:message});
 
             callback();
     })
-
-    socket.on('disconnect', () => {
-        console.log('socket disconnected on server :(((((');
-    })
 });
 
 app.use(router);
-
 server.listen(PORT, () => console.log('Server has started on port ' + PORT));

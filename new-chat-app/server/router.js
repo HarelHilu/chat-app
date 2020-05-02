@@ -4,11 +4,6 @@ const appId = "81f7fc67-9d97-4cf8-b298-a5572b5dc3d0";
 const url = require('url');
 
 router.get('/', (req, res) => {
-    
-    
-
-    console.log(req.query);
-    console.log(req.params);
     res.send("server is here :)");
 });
 
