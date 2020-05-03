@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const appId = "81f7fc67-9d97-4cf8-b298-a5572b5dc3d0";
 const url = require('url');
+const appId = "81f7fc67-9d97-4cf8-b298-a5572b5dc3d0";
 
 router.get('/', (req, res) => {
     res.send("server is here :)");
 });
 
+// MSID installs the app and we get the token from wix and pass in order to get code
 router.get('/wixAuth', (req, res) => {
     token = req.query.token;    
     res.redirect(url.format({
@@ -14,7 +15,8 @@ router.get('/wixAuth', (req, res) => {
         query: {
            "token": token,
            "appId": appId,
-           "redirectUrl": "https://206522c4.ngrok.io/auth"
+           // ngrok redirects URL expires every 7 houes/ We nned it cause Wix need https path to notify webhooks
+           "redirectUrl": "https://11344db9.ngrok.io"
          }
       }));
 });

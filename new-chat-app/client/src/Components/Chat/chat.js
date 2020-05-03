@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import querystring from 'query-string';
 import io from 'socket.io-client';
 import ReactEmoji from 'react-emoji';
-import "./Chat.css";
+import "./chat.css";
 
 let socket;
 
@@ -37,7 +37,6 @@ const Chat = ({location}) => {
     }, [messages]);
     
     const sendMessage = (event) => {
-        //event.preventDefault();
         socket.emit('sendMessage', message, () => setMessage(''));
     }
 
